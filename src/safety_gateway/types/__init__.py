@@ -2,5 +2,5 @@
 
 from __future__ import annotations
 
-from .chat_analyze_and_proxy_params import ChatAnalyzeAndProxyParams as ChatAnalyzeAndProxyParams
-from .chat_analyze_and_proxy_response import ChatAnalyzeAndProxyResponse as ChatAnalyzeAndProxyResponse
+from .chat_create_params import ChatCreateParams as ChatCreateParams
+from .chat_create_response import ChatCreateResponse as ChatCreateResponse

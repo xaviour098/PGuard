@@ -5,7 +5,7 @@ from typing_extensions import Literal
 
 from .._models import BaseModel
 
-__all__ = ["ChatAnalyzeAndProxyResponse", "Analysis"]
+__all__ = ["ChatCreateResponse", "Analysis"]
 
 
 class Analysis(BaseModel):
@@ -18,7 +18,7 @@ class Analysis(BaseModel):
     """List of specific violations found in the prompt."""
 
 
-class ChatAnalyzeAndProxyResponse(BaseModel):
+class ChatCreateResponse(BaseModel):
     id: str
     """Unique ID for this safety check."""
 
