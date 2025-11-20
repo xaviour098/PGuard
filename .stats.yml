@@ -1,0 +1,4 @@
+configured_endpoints: 1
+openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/kaizers%2Fsafety-gateway-004aa279a1f98112b0a506e12682e00eed27f952a633aff352f02c4e674dc5be.yml
+openapi_spec_hash: 05361dafe290ddd17b255aed5ca11b11
+config_hash: b507cefced6e0b9ca5be79070861b5e0
