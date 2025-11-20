@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import httpx
 
-from ..types import chat_analyze_and_proxy_params
+from ..types import chat_create_params
 from .._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
 from .._utils import maybe_transform, async_maybe_transform
 from .._compat import cached_property
@@ -16,7 +16,7 @@ from .._response import (
     async_to_streamed_response_wrapper,
 )
 from .._base_client import make_request_options
-from ..types.chat_analyze_and_proxy_response import ChatAnalyzeAndProxyResponse
+from ..types.chat_create_response import ChatCreateResponse
 
 __all__ = ["ChatResource", "AsyncChatResource"]
 
@@ -41,7 +41,7 @@ class ChatResource(SyncAPIResource):
         """
         return ChatResourceWithStreamingResponse(self)
 
-    def analyze_and_proxy(
+    def create(
         self,
         *,
         prompt: str,
@@ -53,7 +53,7 @@ class ChatResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> ChatAnalyzeAndProxyResponse:
+    ) -> ChatCreateResponse:
         """
         Analyze And Proxy
 
@@ -80,12 +80,12 @@ class ChatResource(SyncAPIResource):
                     "detect_pii": detect_pii,
                     "model": model,
                 },
-                chat_analyze_and_proxy_params.ChatAnalyzeAndProxyParams,
+                chat_create_params.ChatCreateParams,
             ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
-            cast_to=ChatAnalyzeAndProxyResponse,
+            cast_to=ChatCreateResponse,
         )
 
 
@@ -109,7 +109,7 @@ class AsyncChatResource(AsyncAPIResource):
         """
         return AsyncChatResourceWithStreamingResponse(self)
 
-    async def analyze_and_proxy(
+    async def create(
         self,
         *,
         prompt: str,
@@ -121,7 +121,7 @@ class AsyncChatResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> ChatAnalyzeAndProxyResponse:
+    ) -> ChatCreateResponse:
         """
         Analyze And Proxy
 
@@ -148,12 +148,12 @@ class AsyncChatResource(AsyncAPIResource):
                     "detect_pii": detect_pii,
                     "model": model,
                 },
-                chat_analyze_and_proxy_params.ChatAnalyzeAndProxyParams,
+                chat_create_params.ChatCreateParams,
             ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
-            cast_to=ChatAnalyzeAndProxyResponse,
+            cast_to=ChatCreateResponse,
         )
 
 
@@ -161,8 +161,8 @@ class ChatResourceWithRawResponse:
     def __init__(self, chat: ChatResource) -> None:
         self._chat = chat
 
-        self.analyze_and_proxy = to_raw_response_wrapper(
-            chat.analyze_and_proxy,
+        self.create = to_raw_response_wrapper(
+            chat.create,
         )
 
 
@@ -170,8 +170,8 @@ class AsyncChatResourceWithRawResponse:
     def __init__(self, chat: AsyncChatResource) -> None:
         self._chat = chat
 
-        self.analyze_and_proxy = async_to_raw_response_wrapper(
-            chat.analyze_and_proxy,
+        self.create = async_to_raw_response_wrapper(
+            chat.create,
         )
 
 
@@ -179,8 +179,8 @@ class ChatResourceWithStreamingResponse:
     def __init__(self, chat: ChatResource) -> None:
         self._chat = chat
 
-        self.analyze_and_proxy = to_streamed_response_wrapper(
-            chat.analyze_and_proxy,
+        self.create = to_streamed_response_wrapper(
+            chat.create,
         )
 
 
@@ -188,6 +188,6 @@ class AsyncChatResourceWithStreamingResponse:
     def __init__(self, chat: AsyncChatResource) -> None:
         self._chat = chat
 
-        self.analyze_and_proxy = async_to_streamed_response_wrapper(
-            chat.analyze_and_proxy,
+        self.create = async_to_streamed_response_wrapper(
+            chat.create,
         )

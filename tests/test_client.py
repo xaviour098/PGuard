@@ -758,7 +758,7 @@ class TestSafetyGateway:
         respx_mock.post("/v1/chat/completions").mock(side_effect=httpx.TimeoutException("Test timeout error"))
 
         with pytest.raises(APITimeoutError):
-            client.chat.with_streaming_response.analyze_and_proxy(prompt="prompt").__enter__()
+            client.chat.with_streaming_response.create(prompt="prompt").__enter__()
 
         assert _get_open_connections(client) == 0
 
@@ -768,7 +768,7 @@ class TestSafetyGateway:
         respx_mock.post("/v1/chat/completions").mock(return_value=httpx.Response(500))
 
         with pytest.raises(APIStatusError):
-            client.chat.with_streaming_response.analyze_and_proxy(prompt="prompt").__enter__()
+            client.chat.with_streaming_response.create(prompt="prompt").__enter__()
         assert _get_open_connections(client) == 0
 
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
@@ -797,7 +797,7 @@ class TestSafetyGateway:
 
         respx_mock.post("/v1/chat/completions").mock(side_effect=retry_handler)
 
-        response = client.chat.with_raw_response.analyze_and_proxy(prompt="prompt")
+        response = client.chat.with_raw_response.create(prompt="prompt")
 
         assert response.retries_taken == failures_before_success
         assert int(response.http_request.headers.get("x-stainless-retry-count")) == failures_before_success
@@ -821,7 +821,7 @@ class TestSafetyGateway:
 
         respx_mock.post("/v1/chat/completions").mock(side_effect=retry_handler)
 
-        response = client.chat.with_raw_response.analyze_and_proxy(
+        response = client.chat.with_raw_response.create(
             prompt="prompt", extra_headers={"x-stainless-retry-count": Omit()}
         )
 
@@ -846,7 +846,7 @@ class TestSafetyGateway:
 
         respx_mock.post("/v1/chat/completions").mock(side_effect=retry_handler)
 
-        response = client.chat.with_raw_response.analyze_and_proxy(
+        response = client.chat.with_raw_response.create(
             prompt="prompt", extra_headers={"x-stainless-retry-count": "42"}
         )
 
@@ -1609,7 +1609,7 @@ class TestAsyncSafetyGateway:
         respx_mock.post("/v1/chat/completions").mock(side_effect=httpx.TimeoutException("Test timeout error"))
 
         with pytest.raises(APITimeoutError):
-            await async_client.chat.with_streaming_response.analyze_and_proxy(prompt="prompt").__aenter__()
+            await async_client.chat.with_streaming_response.create(prompt="prompt").__aenter__()
 
         assert _get_open_connections(async_client) == 0
 
@@ -1621,7 +1621,7 @@ class TestAsyncSafetyGateway:
         respx_mock.post("/v1/chat/completions").mock(return_value=httpx.Response(500))
 
         with pytest.raises(APIStatusError):
-            await async_client.chat.with_streaming_response.analyze_and_proxy(prompt="prompt").__aenter__()
+            await async_client.chat.with_streaming_response.create(prompt="prompt").__aenter__()
         assert _get_open_connections(async_client) == 0
 
     @pytest.mark.parametrize("failures_before_success", [0, 2, 4])
@@ -1650,7 +1650,7 @@ class TestAsyncSafetyGateway:
 
         respx_mock.post("/v1/chat/completions").mock(side_effect=retry_handler)
 
-        response = await client.chat.with_raw_response.analyze_and_proxy(prompt="prompt")
+        response = await client.chat.with_raw_response.create(prompt="prompt")
 
         assert response.retries_taken == failures_before_success
         assert int(response.http_request.headers.get("x-stainless-retry-count")) == failures_before_success
@@ -1674,7 +1674,7 @@ class TestAsyncSafetyGateway:
 
         respx_mock.post("/v1/chat/completions").mock(side_effect=retry_handler)
 
-        response = await client.chat.with_raw_response.analyze_and_proxy(
+        response = await client.chat.with_raw_response.create(
             prompt="prompt", extra_headers={"x-stainless-retry-count": Omit()}
         )
 
@@ -1699,7 +1699,7 @@ class TestAsyncSafetyGateway:
 
         respx_mock.post("/v1/chat/completions").mock(side_effect=retry_handler)
 
-        response = await client.chat.with_raw_response.analyze_and_proxy(
+        response = await client.chat.with_raw_response.create(
             prompt="prompt", extra_headers={"x-stainless-retry-count": "42"}
         )
 

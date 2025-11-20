@@ -4,10 +4,10 @@ from __future__ import annotations
 
 from typing_extensions import Required, TypedDict
 
-__all__ = ["ChatAnalyzeAndProxyParams"]
+__all__ = ["ChatCreateParams"]
 
 
-class ChatAnalyzeAndProxyParams(TypedDict, total=False):
+class ChatCreateParams(TypedDict, total=False):
     prompt: Required[str]
     """The user prompt to validate against safety rules."""
 
