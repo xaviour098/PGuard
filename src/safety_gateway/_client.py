@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Mapping
-from typing_extensions import Self, override
+from typing import Any, Dict, Mapping, cast
+from typing_extensions import Self, Literal, override
 
 import httpx
 
@@ -12,7 +12,6 @@ from . import _exceptions
 from ._qs import Querystring
 from ._types import (
     Omit,
-    Headers,
     Timeout,
     NotGiven,
     Transport,
@@ -32,6 +31,7 @@ from ._base_client import (
 )
 
 __all__ = [
+    "ENVIRONMENTS",
     "Timeout",
     "Transport",
     "ProxiesTypes",
@@ -42,6 +42,11 @@ __all__ = [
     "AsyncClient",
 ]
 
+ENVIRONMENTS: Dict[str, str] = {
+    "development": "http://localhost:8000",
+    "production": "https://api.yourdomain.com",
+}
+
 
 class SafetyGateway(SyncAPIClient):
     chat: chat.ChatResource
@@ -49,13 +54,14 @@ class SafetyGateway(SyncAPIClient):
     with_streaming_response: SafetyGatewayWithStreamedResponse
 
     # client options
-    api_key: str | None
+
+    _environment: Literal["development", "production"] | NotGiven
 
     def __init__(
         self,
         *,
-        api_key: str | None = None,
-        base_url: str | httpx.URL | None = None,
+        environment: Literal["development", "production"] | NotGiven = not_given,
+        base_url: str | httpx.URL | None | NotGiven = not_given,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
         default_headers: Mapping[str, str] | None = None,
@@ -74,18 +80,32 @@ class SafetyGateway(SyncAPIClient):
         # part of our public interface in the future.
         _strict_response_validation: bool = False,
     ) -> None:
-        """Construct a new synchronous SafetyGateway client instance.
+        """Construct a new synchronous SafetyGateway client instance."""
+        self._environment = environment
 
-        This automatically infers the `api_key` argument from the `SAFETY_GATEWAY_API_KEY` environment variable if it is not provided.
-        """
-        if api_key is None:
-            api_key = os.environ.get("SAFETY_GATEWAY_API_KEY")
-        self.api_key = api_key
+        base_url_env = os.environ.get("SAFETY_GATEWAY_BASE_URL")
+        if is_given(base_url) and base_url is not None:
+            # cast required because mypy doesn't understand the type narrowing
+            base_url = cast("str | httpx.URL", base_url)  # pyright: ignore[reportUnnecessaryCast]
+        elif is_given(environment):
+            if base_url_env and base_url is not None:
+                raise ValueError(
+                    "Ambiguous URL; The `SAFETY_GATEWAY_BASE_URL` env var and the `environment` argument are given. If you want to use the environment, you must pass base_url=None",
+                )
 
-        if base_url is None:
-            base_url = os.environ.get("SAFETY_GATEWAY_BASE_URL")
-        if base_url is None:
-            base_url = f"https://api.example.com"
+            try:
+                base_url = ENVIRONMENTS[environment]
+            except KeyError as exc:
+                raise ValueError(f"Unknown environment: {environment}") from exc
+        elif base_url_env is not None:
+            base_url = base_url_env
+        else:
+            self._environment = environment = "development"
+
+            try:
+                base_url = ENVIRONMENTS[environment]
+            except KeyError as exc:
+                raise ValueError(f"Unknown environment: {environment}") from exc
 
         super().__init__(
             version=__version__,
@@ -109,14 +129,6 @@ class SafetyGateway(SyncAPIClient):
 
     @property
     @override
-    def auth_headers(self) -> dict[str, str]:
-        api_key = self.api_key
-        if api_key is None:
-            return {}
-        return {"Authorization": f"Bearer {api_key}"}
-
-    @property
-    @override
     def default_headers(self) -> dict[str, str | Omit]:
         return {
             **super().default_headers,
@@ -124,21 +136,10 @@ class SafetyGateway(SyncAPIClient):
             **self._custom_headers,
         }
 
-    @override
-    def _validate_headers(self, headers: Headers, custom_headers: Headers) -> None:
-        if self.api_key and headers.get("Authorization"):
-            return
-        if isinstance(custom_headers.get("Authorization"), Omit):
-            return
-
-        raise TypeError(
-            '"Could not resolve authentication method. Expected the api_key to be set. Or for the `Authorization` headers to be explicitly omitted"'
-        )
-
     def copy(
         self,
         *,
-        api_key: str | None = None,
+        environment: Literal["development", "production"] | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.Client | None = None,
@@ -172,8 +173,8 @@ class SafetyGateway(SyncAPIClient):
 
         http_client = http_client or self._client
         return self.__class__(
-            api_key=api_key or self.api_key,
             base_url=base_url or self.base_url,
+            environment=environment or self._environment,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,
             max_retries=max_retries if is_given(max_retries) else self.max_retries,
@@ -226,13 +227,14 @@ class AsyncSafetyGateway(AsyncAPIClient):
     with_streaming_response: AsyncSafetyGatewayWithStreamedResponse
 
     # client options
-    api_key: str | None
+
+    _environment: Literal["development", "production"] | NotGiven
 
     def __init__(
         self,
         *,
-        api_key: str | None = None,
-        base_url: str | httpx.URL | None = None,
+        environment: Literal["development", "production"] | NotGiven = not_given,
+        base_url: str | httpx.URL | None | NotGiven = not_given,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
         default_headers: Mapping[str, str] | None = None,
@@ -251,18 +253,32 @@ class AsyncSafetyGateway(AsyncAPIClient):
         # part of our public interface in the future.
         _strict_response_validation: bool = False,
     ) -> None:
-        """Construct a new async AsyncSafetyGateway client instance.
+        """Construct a new async AsyncSafetyGateway client instance."""
+        self._environment = environment
 
-        This automatically infers the `api_key` argument from the `SAFETY_GATEWAY_API_KEY` environment variable if it is not provided.
-        """
-        if api_key is None:
-            api_key = os.environ.get("SAFETY_GATEWAY_API_KEY")
-        self.api_key = api_key
+        base_url_env = os.environ.get("SAFETY_GATEWAY_BASE_URL")
+        if is_given(base_url) and base_url is not None:
+            # cast required because mypy doesn't understand the type narrowing
+            base_url = cast("str | httpx.URL", base_url)  # pyright: ignore[reportUnnecessaryCast]
+        elif is_given(environment):
+            if base_url_env and base_url is not None:
+                raise ValueError(
+                    "Ambiguous URL; The `SAFETY_GATEWAY_BASE_URL` env var and the `environment` argument are given. If you want to use the environment, you must pass base_url=None",
+                )
 
-        if base_url is None:
-            base_url = os.environ.get("SAFETY_GATEWAY_BASE_URL")
-        if base_url is None:
-            base_url = f"https://api.example.com"
+            try:
+                base_url = ENVIRONMENTS[environment]
+            except KeyError as exc:
+                raise ValueError(f"Unknown environment: {environment}") from exc
+        elif base_url_env is not None:
+            base_url = base_url_env
+        else:
+            self._environment = environment = "development"
+
+            try:
+                base_url = ENVIRONMENTS[environment]
+            except KeyError as exc:
+                raise ValueError(f"Unknown environment: {environment}") from exc
 
         super().__init__(
             version=__version__,
@@ -286,14 +302,6 @@ class AsyncSafetyGateway(AsyncAPIClient):
 
     @property
     @override
-    def auth_headers(self) -> dict[str, str]:
-        api_key = self.api_key
-        if api_key is None:
-            return {}
-        return {"Authorization": f"Bearer {api_key}"}
-
-    @property
-    @override
     def default_headers(self) -> dict[str, str | Omit]:
         return {
             **super().default_headers,
@@ -301,21 +309,10 @@ class AsyncSafetyGateway(AsyncAPIClient):
             **self._custom_headers,
         }
 
-    @override
-    def _validate_headers(self, headers: Headers, custom_headers: Headers) -> None:
-        if self.api_key and headers.get("Authorization"):
-            return
-        if isinstance(custom_headers.get("Authorization"), Omit):
-            return
-
-        raise TypeError(
-            '"Could not resolve authentication method. Expected the api_key to be set. Or for the `Authorization` headers to be explicitly omitted"'
-        )
-
     def copy(
         self,
         *,
-        api_key: str | None = None,
+        environment: Literal["development", "production"] | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.AsyncClient | None = None,
@@ -349,8 +346,8 @@ class AsyncSafetyGateway(AsyncAPIClient):
 
         http_client = http_client or self._client
         return self.__class__(
-            api_key=api_key or self.api_key,
             base_url=base_url or self.base_url,
+            environment=environment or self._environment,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,
             max_retries=max_retries if is_given(max_retries) else self.max_retries,
