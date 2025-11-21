@@ -25,41 +25,36 @@ pip install safety_gateway
 The full API of this library can be found in [api.md](api.md).
 
 ```python
-import os
 from safety_gateway import SafetyGateway
 
 client = SafetyGateway(
-    api_key=os.environ.get("SAFETY_GATEWAY_API_KEY"),  # This is the default and can be omitted
+    # defaults to "development".
+    environment="production",
 )
 
 chat = client.chat.create(
-    prompt="prompt",
+    prompt="Hello from the SDK!",
 )
 print(chat.id)
 ```
-
-While you can provide an `api_key` keyword argument,
-we recommend using [python-dotenv](https://pypi.org/project/python-dotenv/)
-to add `SAFETY_GATEWAY_API_KEY="My API Key"` to your `.env` file
-so that your API Key is not stored in source control.
 
 ## Async usage
 
 Simply import `AsyncSafetyGateway` instead of `SafetyGateway` and use `await` with each API call:
 
 ```python
-import os
 import asyncio
 from safety_gateway import AsyncSafetyGateway
 
 client = AsyncSafetyGateway(
-    api_key=os.environ.get("SAFETY_GATEWAY_API_KEY"),  # This is the default and can be omitted
+    # defaults to "development".
+    environment="production",
 )
 
 
 async def main() -> None:
     chat = await client.chat.create(
-        prompt="prompt",
+        prompt="Hello from the SDK!",
     )
     print(chat.id)
 
@@ -90,11 +85,10 @@ from safety_gateway import AsyncSafetyGateway
 
 async def main() -> None:
     async with AsyncSafetyGateway(
-        api_key="My API Key",
         http_client=DefaultAioHttpClient(),
     ) as client:
         chat = await client.chat.create(
-            prompt="prompt",
+            prompt="Hello from the SDK!",
         )
         print(chat.id)
 
@@ -128,7 +122,7 @@ client = SafetyGateway()
 
 try:
     client.chat.create(
-        prompt="prompt",
+        prompt="Hello from the SDK!",
     )
 except safety_gateway.APIConnectionError as e:
     print("The server could not be reached")
@@ -173,7 +167,7 @@ client = SafetyGateway(
 
 # Or, configure per-request:
 client.with_options(max_retries=5).chat.create(
-    prompt="prompt",
+    prompt="Hello from the SDK!",
 )
 ```
 
@@ -198,7 +192,7 @@ client = SafetyGateway(
 
 # Override per-request:
 client.with_options(timeout=5.0).chat.create(
-    prompt="prompt",
+    prompt="Hello from the SDK!",
 )
 ```
 
@@ -241,7 +235,7 @@ from safety_gateway import SafetyGateway
 
 client = SafetyGateway()
 response = client.chat.with_raw_response.create(
-    prompt="prompt",
+    prompt="Hello from the SDK!",
 )
 print(response.headers.get('X-My-Header'))
 
@@ -261,7 +255,7 @@ To stream the response body, use `.with_streaming_response` instead, which requi
 
 ```python
 with client.chat.with_streaming_response.create(
-    prompt="prompt",
+    prompt="Hello from the SDK!",
 ) as response:
     print(response.headers.get("X-My-Header"))
 
