@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0 (2025-11-21)
+
+Full Changelog: [v1.0.0...v1.1.0](https://github.com/xaviour098/PGuard/compare/v1.0.0...v1.1.0)
+
+### Features
+
+* **api:** manual updates ([0cac69f](https://github.com/xaviour098/PGuard/commit/0cac69f158d7f367a85d97000f6f3f3284006286))
+
 ## 1.0.0 (2025-11-20)
 
 Full Changelog: [v0.0.1...v1.0.0](https://github.com/xaviour098/PGuard/compare/v0.0.1...v1.0.0)
